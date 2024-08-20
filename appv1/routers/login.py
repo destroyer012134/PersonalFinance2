@@ -19,7 +19,7 @@ def authenticate_user(username: str, password: str, db: Session = Depends(get_db
     return user
 
 
-"""
+
 @router.get("/login/", response_model=dict)
 async def accsess(email: str, password: str,  ):
    usuario = get_user_by_email(db, email)
@@ -34,7 +34,7 @@ async def accsess(email: str, password: str,  ):
    data = {"sub": usuario.user_id, "rol": usuario.user_rol}
    token = create_access_token(data)
    return {"token":token} 
-"""
+
 
 
 
