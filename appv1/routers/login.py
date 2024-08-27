@@ -4,7 +4,7 @@ from appv1.crud.users import create_user_sql, delete_user, get_all_users_paginat
 from core.security import create_access_token, verify_password, verify_token
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from appv1.schemas.user import PaginatedUsersResponse, UserCreate, UserResponse, UserUpdate
+from appv1.schemas.user import PaginatedUsersResponse, UserCreate, UserResponse, UserUpdate, ResponseLoggin, UserLoggin
 from db.database import get_db
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
@@ -38,7 +38,7 @@ async def accsess(email: str, password: str,  ):
 
 
 
-@router.post("/token")
+@router.post("/token", response_model=ResponseLoggin)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db)
@@ -53,7 +53,16 @@ async def login_for_access_token(
     access_token = create_access_token(
         data={"sub": user.user_id, "rol": user.user_rol}, 
     )
-    return {"access_token":access_token, "token_type":"bearer"}
+    return ResponseLoggin(
+        user=UserLoggin(
+            user_id=user.user_id,
+            full_name=user.full_name,
+            mail=user.mail,
+            user_role=user.user_role
+        ),
+        access_token=access_token
+    )
+
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/access/token")

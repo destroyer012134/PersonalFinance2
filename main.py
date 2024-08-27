@@ -29,5 +29,5 @@ def on_startup():
 def read_root():
     return {
                 "message": "ADSO 2670586",
-                "autor": "Miguel Mor"
+                "autor": "Miguel Mora"
             }
