@@ -1,12 +1,8 @@
-from typing import Annotated
-from pydantic import BaseModel, StringConstraints
-from datetime import datetime
+from pydantic import BaseModel
 
-class RoleCreate(BaseModel):
-    rol_name: Annotated[str, StringConstraints(max_length=15)]
-
-
-class RoleResponse(RoleCreate):
+class RoleBase(BaseModel):
     rol_name: str
-    created_at: datetime
-    updated_at: datetime
+
+class RoleCreate(RoleBase):
+    pass
+

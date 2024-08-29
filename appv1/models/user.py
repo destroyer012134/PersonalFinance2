@@ -1,7 +1,7 @@
-from sqlalchemy import Column, DateTime, String, Boolean, ForeignKey, CHAR, TIMESTAMP
-from sqlalchemy.orm import relationship
-from appv1.models.base_class import Base
 from datetime import datetime
+from sqlalchemy import CHAR, TIMESTAMP, Boolean, Column, DateTime, ForeignKey, String
+from appv1.models.base_class import Base
+from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = 'users'
@@ -14,4 +14,4 @@ class User(Base):
     created_at = Column(TIMESTAMP, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    role = relationship("Role")
+role = relationship("Role")

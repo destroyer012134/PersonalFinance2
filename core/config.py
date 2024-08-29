@@ -3,14 +3,13 @@ import os
 
 # Obtener la ruta al archivo .env
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
-
 # Cargar variables de entorno desde el archivo .env
 load_dotenv(dotenv_path)
 
 class Settings:
-    PROJECT_NAME: str = "GESTION-HOTEL"
+    PROJECT_NAME: str = "GASTOS-INGRESOS"
     PROJECT_VERSION: str = "0.0.1"
-    PROJECT_DESCRIPTION: str = "Aplicación para administrar los hoteles del SENA"
+    PROJECT_DESCRIPTION: str = "Aplicación para administrar los gastos e ingresos de varios usuarios"
 
     DB_HOST: str = os.getenv("DB_HOST") 
     DB_USER: str = os.getenv("DB_USER")
@@ -22,7 +21,7 @@ class Settings:
 
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     
-    TOKEN_EXPIRE_MIN = 15
+    TOKEN_EXPIRE_MIN = 30  # in mins
     ALGORITHM: str = os.getenv("ALGORITHM")
 
 settings = Settings()

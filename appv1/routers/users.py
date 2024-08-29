@@ -1,146 +1,60 @@
-from typing import List
-from appv1.crud.permissions import get_permissions
-from fastapi import APIRouter, Depends,  HTTPException
-from appv1.crud.users import create_user_sql, delete_user, get_all_users_paginated, get_user_by_email, get_all_users, get_user_by_id, get_users_by_role, update_user
-from sqlalchemy.orm import Session
-from sqlalchemy import text
-from appv1.routers.login import get_current_user
-from appv1.schemas.user import PaginatedUsersResponse, UserCreate, UserResponse, UserUpdate
-from db.database import get_db
+# from typing import List
+# from fastapi import APIRouter, Depends
+# from sqlalchemy.orm import Session
+# from appv1.crud.users import update_user
+# from appv1.crud.usersSQL import create_user_raw, create_user_raw2, get_all_users_paginated, get_all_users_raw, get_user_by_id_raw
+# from appv1.crud.usersORM import create_user
 
-router = APIRouter()
+# from appv1.schemas.user import PaginatedUsersResponse, UserCreate, UserResponse, UserUpdate
+# from db.database import get_db
 
-MODULE = 'usuarios'
+# router = APIRouter()
 
+# # Endpoint para crear un usuario
+# @router.post("/create/", response_model=dict)
+# def insert_user(user: UserCreate, db: Session = Depends(get_db)):
+#     db_user = create_user_raw2(
+#         db,
+#         user.user_id,
+#         user.full_name,
+#         user.mail,
+#         user.passhash,
+#         user.user_role
+#     )
+#     return {"mensaje":"registro almacenado con éxito"}
 
-@router.post("/create_user")
-async def insert_user(
-   user: UserCreate, 
-   db: Session = Depends(get_db),
-   current_user: UserResponse = Depends(get_current_user) 
-):
-   permisos = get_permissions(db, current_user.user_role, MODULE)
-   if not permisos.p_insert:
-      raise HTTPException(status_code=401, detail="Usuario no autorizado")
-   if current_user.user_role != "SuperAdmin":
-      if user.user_role == "SuperAdmin":
-         raise HTTPException(status_code=401, detail="Usuario no autorizado")
-   
-   respuesta = create_user_sql(db, user)
-   if respuesta:
-      return {"mensaje":"Usuario registrado con exito"}
-   
+# @router.get("/get-by-id/", response_model=UserResponse)
+# def read_by_id(user_id: str, db: Session = Depends(get_db)):
+#     return get_user_by_id_raw(db, user_id)
 
-   
+# @router.get("/get-all/", response_model=List[UserResponse])
+# def read_all( db: Session = Depends(get_db)):
+#     return get_all_users_raw(db)
 
-   
-@router.get("/get-user-by-email/", response_model=UserResponse)
-async def read_user_by_email(
-   email: str,
-   db: Session = Depends(get_db),
-   current_user: UserResponse = Depends(get_current_user)                            
-):
-   permisos = get_permissions(db, current_user.user_role, MODULE)
-   if current_user.mail != email: #si el email es diferente es por que esta queriendo consultar algo diferente a el
-      if not permisos.p_select: 
-         raise HTTPException(status_code=401, detail="Usuario no autorizado")
+# @router.get("/get-all-paginated/", response_model=List[UserResponse])
+# def read_all(page: int = 1, page_size: int = 10, db: Session = Depends(get_db)):
+#     users = get_all_users_paginated(db, page, page_size)
+#     return users
 
-   usuario = get_user_by_email(db, email)
-   if usuario is None:
-      raise HTTPException(status_code=404, detail="Usuario no encontrado")
-   
-   return usuario 
+# # Endpoint para actualizar un usuario
+# @router.put("/update/", response_model=dict)
+# def update_user_by_id(user: UserUpdate, db: Session = Depends(get_db)):
+#     db_user = update_user(db, user)
+#     if db_user:
+#         return {"mensaje":"registro actualizado con éxito"}
 
-@router.get("/get-all-users/", response_model=List[UserResponse])
-async def read_all_users(
-   db: Session = Depends(get_db), 
-   current_user: UserResponse = Depends(get_current_user)                            
-):
-   permisos = get_permissions(db, current_user.user_role, MODULE)
-   if not permisos.p_select:
-      raise HTTPException(status_code=401, detail="Usuario no autorizado")
-   
-   usuarios = get_all_users(db)
-   if len(usuarios)==0:
-      raise HTTPException(status_code=404, detail="No hay usuarios ")
-   
-   return usuarios 
-
-@router.get("/get-users-by-role/", response_model=List[UserResponse])
-async def read_all_users_by_role( db: Session = Depends(get_db)):
-   usuarios = get_users_by_role(db)
-   if len(usuarios)==0:
-      raise HTTPException(status_code=404, detail="No hay usuarios con ese role ")
-   
-   return usuarios 
-
-# Endpoint para actualizar un usuario
-@router.put("/update/", response_model=dict)
-def update_user_by_id(
-   user_id: str,
-   user: UserUpdate, 
-   db: Session = Depends(get_db),
-   current_user: UserResponse = Depends(get_current_user)                            
-   ):
-   
-   permisos = get_permissions(db, current_user.user_role, MODULE)
-   if  user_id != current_user.user_id:
-      if not permisos.p_update:
-         raise HTTPException(status_code=401, detail="Usuario no autorizado")
-   
-   verify_user = get_user_by_id(db, user_id)
-   if verify_user is None: 
-      raise HTTPException(status_code=404, detail="Usuario no encontrado ")
- 
-
-   db_user = update_user(db, user_id, user)
-   if db_user:
-        return {"mensaje": "registro actualizado con éxito"}
-   
-
-# usuarios paginados
-@router.get("/users-by-page/", response_model=PaginatedUsersResponse)
-def get_all_users_by_page(
-   page: int = 1,
-   page_size: int = 10,
-   db: Session = Depends(get_db),
-   current_user: UserResponse = Depends(get_current_user)                            
-   ):
-
-   permisos = get_permissions(db, current_user.user_role, MODULE)
-   if not permisos.p_select:
-      raise HTTPException(status_code=401, detail="Usuario no autorizado")
+# # usuarios paginados
+# @router.get("/users-by-page/", response_model=PaginatedUsersResponse)
+# def get_all_users_by_page(page: int = 1, page_size: int = 10, db: Session = Depends(get_db)):
     
-   users, total_pages = get_all_users_paginated(db, page, page_size)
+#     users, total_pages = get_all_users_paginated(db, page, page_size)
 
-   return {
-        "users": users,
-        "total_pages": total_pages,
-        "current_page": page,
-        "page_size": page_size
-   }
+#     # Convertir el resultado a una lista de diccionarios
+#     users_list = [dict(user) for user in users]
 
-
-
-@router.delete("/delete/{user_id}", response_model=dict)
-def delete_user_by_id(
-   user_id: str,
-   user: UserUpdate,
-   db: Session = Depends(get_db),
-   current_user: UserResponse = Depends(get_current_user)                           
-   ):
-
-   permisos = get_permissions(db, current_user.user_role, MODULE)
-   if  user_id != current_user.user_id:
-      if not permisos.p_delete:
-         raise HTTPException(status_code=401, detail="Usuario no autorizado")
-      
-   verify_user = get_user_by_id(db, user_id)
-   if verify_user is None: 
-      raise HTTPException(status_code=404, detail="Usuario no encontrado ")
-      
-   result = delete_user(db, user_id, user)
-   if result:
-        return {"mensaje": "Usuario eliminado con éxito"}
-
-
+#     return {
+#         "users": users_list,
+#         "total_pages": total_pages,
+#         "current_page": page,
+#         "page_size": page_size
+#     }

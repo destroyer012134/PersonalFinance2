@@ -1,14 +1,12 @@
-from typing import Annotated
-from pydantic import BaseModel, StringConstraints
-from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional
 
-class CategoryCreate(BaseModel):
-    category_name: Annotated[str, StringConstraints(max_length=50)]
-    category_description: Annotated[str, StringConstraints(max_length=120)]
-
-
-class CategoryResponse(CategoryCreate):
-    category_id: str
+class CategoryBase(BaseModel):
+    category_id: Optional[int] = None
+    category_name: str
+    category_description: str
     category_status: bool = True
-    created_at: datetime
-    updated_at: datetime
+
+class CategoryCreate(CategoryBase):
+    pass
+
